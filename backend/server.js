@@ -15,7 +15,7 @@ const pool = new Pool({
     port: 5432,
     database: 'libraries_db',
     user: 'postgres',
-    password: 'nova123'  // <-- промени го ова
+    password: 'nova123'
 })
 
 // ─── BOOKS ───
