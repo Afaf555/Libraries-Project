@@ -47,11 +47,11 @@ nav {
   z-index: 100;
 }
 
-nav::before {
-  content: '📚';
-  font-size: 1.4rem;
-  margin-right: 0.5rem;
-}
+/*nav::before {*/
+/*  content: '📚';*/
+/*  font-size: 1.4rem;*/
+/*  margin-right: 0.5rem;*/
+/*}*/
 
 nav a {
   font-family: 'Lato', sans-serif;
@@ -123,9 +123,9 @@ h3 {
 
 /* ─── BOOK GRID ─── */
 .book-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1.8rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 200px));
+    gap: 1.5rem;
 }
 
 /* ─── BOOK CARD ─── */

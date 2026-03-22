@@ -4,11 +4,23 @@
     <div class="divider"></div>
 
     <div v-if="reservations.length" class="reservation-list">
-      <div class="reservation-item" v-for="(r, i) in reservations" :key="i">
-        <span class="book-title">{{ r.book }}</span>
-        <span class="delivery-type">
-          {{ r.type === 'pickup' ? '🏛️ Pickup' : '🏠 Delivery' }}
-        </span>
+      <div class="reservation-item" v-for="r in reservations" :key="r.id">
+
+        <div class="reservation-info">
+          <span class="book-title">{{ r.book }}</span>
+          <span class="book-author">{{ r.author }}</span>
+          <span class="reservation-date">
+            {{ new Date(r.created_at).toLocaleDateString('mk-MK', { year: 'numeric', month: 'long', day: 'numeric' }) }}
+          </span>
+        </div>
+
+        <div class="reservation-right">
+          <span class="delivery-type">
+            {{ r.type === 'pickup' ? 'Pickup' : 'Home Delivery' }}
+          </span>
+          <button class="btn btn-danger" @click="cancel(r.id)">Cancel</button>
+        </div>
+
       </div>
     </div>
 
@@ -32,7 +44,49 @@ export default {
   },
 
   async mounted() {
-    this.reservations = BookService.getReservations()
+    this.reservations = await BookService.getReservations()
+  },
+
+  methods: {
+    async cancel(id) {
+      if (!confirm('Are you sure you want to cancel this reservation?')) return
+      await BookService.cancelReservation(id)
+      this.reservations = await BookService.getReservations()
+    }
   }
 }
 </script>
+
+<style scoped>
+.reservation-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.reservation-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.book-author {
+  font-size: 0.88rem;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+.reservation-date {
+  font-size: 0.78rem;
+  color: var(--text-light);
+  letter-spacing: 0.03em;
+}
+
+.reservation-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+</style>

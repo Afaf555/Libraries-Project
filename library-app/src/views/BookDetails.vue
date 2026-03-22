@@ -3,7 +3,14 @@
     <router-link to="/" class="back-link">← Back to Library</router-link>
 
     <div v-if="book" class="details-wrap">
-      <div class="details-cover">📖</div>
+
+      <!-- Cover -->
+      <div class="details-cover">
+        <img v-if="book.cover_url" :src="book.cover_url" :alt="book.title" class="cover-img"/>
+        <div v-else class="cover-placeholder">
+          {{ book.title.charAt(0) }}
+        </div>
+      </div>
 
       <div class="details-meta">
         <div>
@@ -19,8 +26,8 @@
         <div v-if="book.available" class="reserve-form">
           <label for="delivery">Delivery Method</label>
           <select id="delivery" v-model="deliveryType">
-            <option value="pickup">🏛️ Pickup from Library</option>
-            <option value="delivery">🏠 Home Delivery</option>
+            <option value="pickup">Pickup from Library</option>
+            <option value="delivery">Home Delivery</option>
           </select>
           <button class="btn btn-gold" @click="reserve">Reserve This Book</button>
         </div>
@@ -51,15 +58,43 @@ export default {
 
   async mounted() {
     const id = parseInt(this.$route.params.id)
-    this.book = BookService.getBookById(id)
+    this.book = await BookService.getBookById(id)
   },
 
   methods: {
-    reserve() {
-      BookService.reserveBook(this.book, this.deliveryType)
+    async reserve() {
+      await BookService.reserveBook(this.book.id, this.deliveryType)
       alert(`"${this.book.title}" reserved for ${this.deliveryType === 'pickup' ? 'library pickup' : 'home delivery'}!`)
       this.$router.push('/reservations')
     }
   }
 }
 </script>
+
+<style scoped>
+.details-cover {
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 3/4;
+  box-shadow: 8px 8px 30px var(--shadow-strong);
+}
+
+.cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cover-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, var(--green-dark), var(--green-mid));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 5rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.4);
+}
+</style>
