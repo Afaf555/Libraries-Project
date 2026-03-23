@@ -17,22 +17,26 @@
 
       <div class="nav-links">
         <router-link to="/" class="nav-link">Home</router-link>
-        <span class="nav-sep"></span>
-        <router-link to="/reservations" class="nav-link">My Reservations</router-link>
+
+        <!-- Само за обичен корисник -->
+        <template v-if="!isAdmin">
+          <span class="nav-sep"></span>
+          <router-link to="/reservations" class="nav-link">My Reservations</router-link>
+        </template>
 
         <!-- Само за admin -->
         <template v-if="isAdmin">
           <span class="nav-sep"></span>
-          <router-link to="/admin" class="nav-link">Admin</router-link>
+          <router-link to="/admin" class="nav-link">Admin Panel</router-link>
         </template>
 
         <span class="nav-sep"></span>
 
         <!-- Корисник + logout -->
         <div v-if="user" class="nav-user">
-        <router-link to="/profile" class="nav-link">{{ user.name }}</router-link>
-        <button class="nav-logout" @click="logout">Log out</button>
-      </div>
+          <router-link v-if="!isAdmin" to="/profile" class="nav-link">{{ user.name }}</router-link>
+          <button class="nav-logout" @click="logout">Log out</button>
+        </div>
         <router-link v-else to="/login" class="nav-link nav-login">Log in</router-link>
       </div>
     </nav>
@@ -61,8 +65,8 @@
         <div class="footer-col">
           <h4 class="footer-heading">Навигација</h4>
           <router-link to="/" class="footer-link">Home</router-link>
-          <router-link to="/reservations" class="footer-link">My Reservations</router-link>
-          <router-link v-if="isAdmin" to="/admin" class="footer-link">Admin</router-link>
+          <router-link v-if="!isAdmin" to="/reservations" class="footer-link">My Reservations</router-link>
+          <router-link v-if="isAdmin" to="/admin" class="footer-link">Admin Panel</router-link>
         </div>
 
         <div class="footer-col">

@@ -8,15 +8,15 @@ const app = express()
 const PORT = 3000
 const JWT_SECRET = 'library_secret_key_2024'
 
-app.use(cors({ origin: 'http://localhost:5173' }))
+app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:5174'] }))
 app.use(express.json())
 
 const pool = new Pool({
     host: 'localhost',
     port: 5432,
     database: 'libraries_db',
-    user: 'saramihajlova',
-    password: ''
+    user: 'postgres',
+    password: 'nova123'
 })
 
 // ─── HELPER: get user from token ─────────────────────────
