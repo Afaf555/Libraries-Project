@@ -1,7 +1,6 @@
 <template>
   <div class="auth-page">
 
-    <!-- Left decorative panel -->
     <div class="auth-panel">
       <div class="panel-content">
         <div class="panel-logo">
@@ -12,10 +11,9 @@
           </svg>
           <span class="panel-logo-name">The Library</span>
         </div>
-        <h1 class="panel-title">Вашата дигитална библиотека</h1>
-        <p class="panel-subtitle">Истражувајте илјадници книги и резервирајте онлајн.</p>
+        <h1 class="panel-title">Your digital library</h1>
+        <p class="panel-subtitle">Search thousands of books and reserve online.</p>
 
-        <!-- Single row floating golden books -->
         <div class="shelf">
           <div class="row row-front">
             <div class="b" style="--w:34px;--h:118px;--o:1;  --d:0s;"></div>
@@ -31,37 +29,32 @@
       </div>
     </div>
 
-    <!-- Right form panel -->
     <div class="auth-form-panel">
       <div class="form-container">
 
-        <!-- Tabs -->
         <div class="tabs">
-          <button class="tab" :class="{ active: mode === 'login' }" @click="switchMode('login')">Најава</button>
-          <button class="tab" :class="{ active: mode === 'register' }" @click="switchMode('register')">Регистрација</button>
+          <button class="tab" :class="{ active: mode === 'login' }" @click="switchMode('login')">Log in</button>
+          <button class="tab" :class="{ active: mode === 'register' }" @click="switchMode('register')">Register</button>
           <div class="tab-indicator" :class="{ right: mode === 'register' }"></div>
         </div>
 
-        <!-- Error message -->
         <div v-if="error" class="alert alert-error">
           {{ error }}
         </div>
 
-        <!-- Success message -->
         <div v-if="success" class="alert alert-success">
           {{ success }}
         </div>
 
-        <!-- LOGIN FORM -->
         <form v-if="mode === 'login'" class="auth-form" @submit.prevent="handleLogin">
           <div class="field">
-            <label>Е-пошта</label>
-            <input v-model="loginForm.email" type="email" placeholder="vase@email.com" required :disabled="loading"/>
+            <label>E-mail</label>
+            <input v-model="loginForm.email" type="email" placeholder="your@email.com" required :disabled="loading"/>
           </div>
           <div class="field">
-            <label>Лозинка</label>
+            <label>Password</label>
             <div class="password-wrap">
-              <input v-model="loginForm.password" :type="showPassword ? 'text' : 'password'" placeholder="Внесете лозинка" required :disabled="loading"/>
+              <input v-model="loginForm.password" :type="showPassword ? 'text' : 'password'" placeholder="Enter your password" required :disabled="loading"/>
               <button type="button" class="toggle-pw" @click="showPassword = !showPassword">
                 {{ showPassword ? '🙈' : '👁️' }}
               </button>
@@ -69,50 +62,49 @@
           </div>
           <button type="submit" class="btn-primary" :disabled="loading">
             <span v-if="loading" class="spinner"></span>
-            <span v-else>Најави се</span>
+            <span v-else>Log in</span>
           </button>
           <p class="switch-hint">
-            Немате профил?
-            <a href="#" @click.prevent="switchMode('register')">Регистрирајте се</a>
+            You don't have a profile?
+            <a href="#" @click.prevent="switchMode('register')">Register</a>
           </p>
         </form>
 
-        <!-- REGISTER FORM -->
         <form v-if="mode === 'register'" class="auth-form" @submit.prevent="handleRegister">
           <div class="field">
-            <label>Име и презиме</label>
-            <input v-model="registerForm.name" type="text" placeholder="Ване Петров" required :disabled="loading"/>
+            <label>First and Last name</label>
+            <input v-model="registerForm.name" type="text" placeholder="John Doe" required :disabled="loading"/>
           </div>
           <div class="field">
-            <label>Е-пошта</label>
-            <input v-model="registerForm.email" type="email" placeholder="vase@email.com" required :disabled="loading"/>
+            <label>E-mail</label>
+            <input v-model="registerForm.email" type="email" placeholder="johndoe@email.com" required :disabled="loading"/>
           </div>
           <div class="field">
-            <label>Лозинка</label>
+            <label>Password</label>
             <div class="password-wrap">
-              <input v-model="registerForm.password" :type="showPassword ? 'text' : 'password'" placeholder="Минимум 6 карактери" required minlength="6" :disabled="loading"/>
+              <input v-model="registerForm.password" :type="showPassword ? 'text' : 'password'" placeholder="Minimum 6 characters" required minlength="6" :disabled="loading"/>
               <button type="button" class="toggle-pw" @click="showPassword = !showPassword">
                 {{ showPassword ? '🙈' : '👁️' }}
               </button>
             </div>
           </div>
           <div class="field">
-            <label>Потврди лозинка</label>
+            <label>Submit password</label>
             <div class="password-wrap">
-              <input v-model="registerForm.confirmPassword" :type="showConfirm ? 'text' : 'password'" placeholder="Повторете ја лозинката" required :disabled="loading"/>
+              <input v-model="registerForm.confirmPassword" :type="showConfirm ? 'text' : 'password'" placeholder="Repeat your password" required :disabled="loading"/>
               <button type="button" class="toggle-pw" @click="showConfirm = !showConfirm">
                 {{ showConfirm ? '🙈' : '👁️' }}
               </button>
             </div>
-            <span v-if="passwordMismatch" class="field-error">Лозинките не се совпаѓаат</span>
+            <span v-if="passwordMismatch" class="field-error">The passwords don't match</span>
           </div>
           <button type="submit" class="btn-primary" :disabled="loading || passwordMismatch">
             <span v-if="loading" class="spinner"></span>
-            <span v-else>Регистрирај се</span>
+            <span v-else>Register</span>
           </button>
           <p class="switch-hint">
-            Веќе имате профил?
-            <a href="#" @click.prevent="switchMode('login')">Најавете се</a>
+            Already have a profile?
+            <a href="#" @click.prevent="switchMode('login')">Log in</a>
           </p>
         </form>
 
@@ -198,14 +190,12 @@ export default {
 </script>
 
 <style scoped>
-/* ── Layout ─────────────────────────────────────── */
 .auth-page {
   display: flex;
   min-height: 100vh;
   font-family: 'Georgia', serif;
 }
 
-/* ── Left panel ─────────────────────────────────── */
 .auth-panel {
   width: 45%;
   background: #1a2332;
@@ -234,7 +224,6 @@ export default {
   max-width: 380px;
 }
 
-/* Logo */
 .panel-logo {
   display: flex;
   align-items: center;
@@ -292,7 +281,6 @@ export default {
   50%       { transform: translateY(-10px); }
 }
 
-/* ── Right panel ─────────────────────────────────── */
 .auth-form-panel {
   flex: 1;
   display: flex;
@@ -307,7 +295,6 @@ export default {
   max-width: 400px;
 }
 
-/* ── Tabs ───────────────────────────────────────── */
 .tabs {
   display: flex;
   position: relative;
@@ -349,7 +336,6 @@ export default {
 
 .tab-indicator.right { transform: translateX(100%); }
 
-/* ── Alerts ─────────────────────────────────────── */
 .alert {
   padding: 0.75rem 1rem;
   border-radius: 8px;
@@ -366,7 +352,6 @@ export default {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Form ───────────────────────────────────────── */
 .auth-form { display: flex; flex-direction: column; gap: 1.2rem; }
 
 .field { display: flex; flex-direction: column; gap: 0.4rem; }
@@ -416,7 +401,6 @@ export default {
 
 .field-error { font-size: 0.82rem; color: #c0392b; margin-top: 0.2rem; }
 
-/* ── Submit button ──────────────────────────────── */
 .btn-primary {
   margin-top: 0.4rem;
   padding: 0.85rem;
@@ -440,7 +424,6 @@ export default {
 .btn-primary:active:not(:disabled) { transform: scale(0.98); }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* ── Spinner ────────────────────────────────────── */
 .spinner {
   width: 18px;
   height: 18px;
@@ -453,12 +436,10 @@ export default {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── Switch hint ─────────────────────────────────── */
 .switch-hint { text-align: center; font-size: 0.9rem; color: #7a6e65; margin-top: 0.3rem; }
 .switch-hint a { color: #c9a84c; font-weight: 700; text-decoration: none; }
 .switch-hint a:hover { text-decoration: underline; }
 
-/* ── Responsive ─────────────────────────────────── */
 @media (max-width: 768px) {
   .auth-page { flex-direction: column; }
   .auth-panel { width: 100%; padding: 2.5rem 2rem; min-height: auto; }

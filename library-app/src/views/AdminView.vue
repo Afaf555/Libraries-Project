@@ -3,7 +3,6 @@
     <h2>Admin Panel</h2>
     <div class="divider"></div>
 
-    <!-- ADD / EDIT FORM -->
     <div class="admin-form">
       <h3>{{ editingBook ? 'Edit Book' : 'Add New Book' }}</h3>
       <div class="form-grid">
@@ -18,6 +17,13 @@
         <div class="form-group">
           <label>Year</label>
           <input v-model="form.year" type="number" placeholder="e.g. 1997" />
+        </div>
+        <div class="form-group">
+          <label>Genre</label>
+          <select v-model="form.genre">
+            <option value="">— Select genre —</option>
+            <option v-for="g in genres" :key="g" :value="g">{{ g }}</option>
+          </select>
         </div>
         <div class="form-group">
           <label>Available</label>
@@ -144,7 +150,10 @@ export default {
       editingBook: null,
       form: {
         title: '', author: '', year: '', description: '', available: true, cover_url: ''
-      }
+      },
+      genres: ['Fiction', 'Non-Fiction', 'Fantasy', 'Science Fiction',
+        'Mystery', 'Romance', 'History', 'Philosophy',
+        'Science', 'Biography', 'Children', 'Other'],
     }
   },
 

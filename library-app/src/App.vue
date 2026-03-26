@@ -1,7 +1,6 @@
 <template>
   <div class="app-wrapper">
 
-    <!-- ── NAVBAR ─────────────────────────────────────── -->
     <nav class="navbar">
       <router-link to="/" class="nav-logo">
         <svg width="32" height="26" viewBox="0 0 32 26" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -17,14 +16,13 @@
 
       <div class="nav-links">
         <router-link to="/" class="nav-link">Home</router-link>
-
-        <!-- Само за обичен корисник -->
+        <span class="nav-sep"></span>
+        <router-link to="/books" class="nav-link">Books</router-link>
         <template v-if="!isAdmin">
           <span class="nav-sep"></span>
           <router-link to="/reservations" class="nav-link">My Reservations</router-link>
         </template>
 
-        <!-- Само за admin -->
         <template v-if="isAdmin">
           <span class="nav-sep"></span>
           <router-link to="/admin" class="nav-link">Admin Panel</router-link>
@@ -32,7 +30,6 @@
 
         <span class="nav-sep"></span>
 
-        <!-- Корисник + logout -->
         <div v-if="user" class="nav-user">
           <router-link v-if="!isAdmin" to="/profile" class="nav-link">{{ user.name }}</router-link>
           <button class="nav-logout" @click="logout">Log out</button>
@@ -41,12 +38,10 @@
       </div>
     </nav>
 
-    <!-- ── PAGE CONTENT ───────────────────────────────── -->
     <main class="app-main">
       <router-view/>
     </main>
 
-    <!-- ── FOOTER ─────────────────────────────────────── -->
     <footer class="footer">
       <div class="footer-inner">
 
@@ -65,6 +60,8 @@
         <div class="footer-col">
           <h4 class="footer-heading">Навигација</h4>
           <router-link to="/" class="footer-link">Home</router-link>
+          <span class="nav-sep"></span>
+          <router-link to="/books" class="nav-link">Книги</router-link>
           <router-link v-if="!isAdmin" to="/reservations" class="footer-link">My Reservations</router-link>
           <router-link v-if="isAdmin" to="/admin" class="footer-link">Admin Panel</router-link>
         </div>
@@ -142,7 +139,6 @@ export default {
 
 .app-main { flex: 1; }
 
-/* ── Navbar ──────────────────────────────────────── */
 .navbar {
   display: flex;
   align-items: center;
@@ -233,7 +229,6 @@ export default {
   background: rgba(201, 168, 76, 0.2);
 }
 
-/* ── User + logout ───────────────────────────────── */
 .nav-user {
   display: flex;
   align-items: center;
@@ -266,7 +261,6 @@ export default {
   border-color: rgba(201, 168, 76, 0.5);
 }
 
-/* ── Footer ──────────────────────────────────────── */
 .footer {
   background: #2c1a0e;
   border-top: 1px solid rgba(201, 168, 76, 0.2);

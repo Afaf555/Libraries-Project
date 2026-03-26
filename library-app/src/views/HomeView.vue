@@ -1,7 +1,6 @@
 <template>
   <div>
 
-    <!-- ── HERO ─────────────────────────────────────────── -->
     <section class="hero">
       <div class="hero-bg">
         <div class="hero-circle c1"></div>
@@ -65,10 +64,6 @@
       </div>
     </section>
 
-    <!-- ── ABOUT SECTION ─────────────────────────────────── -->
-
-
-    <!-- ── BOOK LIST ──────────────────────────────────────── -->
     <div class="page">
       <h1>The <span>Library</span></h1>
       <p class="subtitle">Discover, reserve, and enjoy great books.</p>
@@ -234,7 +229,6 @@ export default {
 </script>
 
 <style scoped>
-/* ── Hero ────────────────────────────────────────── */
 .hero {
   position: relative;
   display: flex;
@@ -324,7 +318,6 @@ export default {
   border-radius: 1px 0 0 1px;
 }
 
-/* ── About ───────────────────────────────────────── */
 .about {
   display: flex;
   align-items: stretch;
@@ -413,7 +406,6 @@ export default {
   flex-shrink: 0;
 }
 
-/* ── Search ──────────────────────────────────────── */
 .search-wrap { position: relative; max-width: 560px; margin-bottom: 0.8rem; }
 
 .search-icon {
@@ -479,7 +471,6 @@ export default {
 
 .results-count { font-size: 0.85rem; color: #8b6b4a; margin-bottom: 1rem; font-style: italic; }
 
-/* ── Carousel ────────────────────────────────────── */
 .carousel-wrap {
   position: relative;
   display: flex;
@@ -524,7 +515,6 @@ export default {
 }
 .carousel-btn:disabled { opacity: 0.3; cursor: default; }
 
-/* ── Responsive ──────────────────────────────────── */
 @media (max-width: 900px) {
   .hero { flex-direction: column; padding: 3rem 2rem; text-align: center; min-height: auto; }
   .hero-title { font-size: 2.2rem; }

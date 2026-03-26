@@ -59,7 +59,6 @@ export default {
         return res.json()
     },
 
-    // ─── AUTH ───────────────────────────────────────────────
 
     async login(email, password) {
         const res = await fetch(`${API}/auth/login`, {
@@ -71,7 +70,7 @@ export default {
             const err = await res.json()
             throw new Error(err.message || 'Грешка при логирање')
         }
-        return res.json() // очекува { token, user }
+        return res.json()
     },
 
     async register(name, email, password) {
@@ -84,38 +83,32 @@ export default {
             const err = await res.json()
             throw new Error(err.message || 'Грешка при регистрација')
         }
-        return res.json() // очекува { token, user }
+        return res.json()
     },
 
-    // Зачувај токен и корисник во localStorage
     saveSession(token, user) {
         localStorage.setItem('token', token)
         localStorage.setItem('user', JSON.stringify(user))
     },
 
-    // Земи моментален корисник
     getUser() {
         const user = localStorage.getItem('user')
         return user ? JSON.parse(user) : null
     },
 
-    // Земи токен
     getToken() {
         return localStorage.getItem('token')
     },
 
-    // Проверка дали е логиран
     isLoggedIn() {
         return !!localStorage.getItem('token')
     },
 
-    // Проверка дали е admin
     isAdmin() {
         const user = this.getUser()
         return user?.role === 'admin'
     },
 
-    // Одјави се
     logout() {
         localStorage.removeItem('token')
         localStorage.removeItem('user')

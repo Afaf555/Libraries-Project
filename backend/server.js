@@ -19,7 +19,6 @@ const pool = new Pool({
     password: 'nova123'
 })
 
-// ─── HELPER: get user from token ─────────────────────────
 function getUserFromToken(req) {
     const auth = req.headers.authorization
     if (!auth) return null
@@ -31,7 +30,6 @@ function getUserFromToken(req) {
     }
 }
 
-// ─── AUTH ─────────────────────────────────────────────────
 
 app.post('/api/auth/register', async (req, res) => {
     const { name, email, password } = req.body
@@ -75,7 +73,6 @@ app.post('/api/auth/login', async (req, res) => {
     }
 })
 
-// GET /api/auth/profile
 app.get('/api/auth/profile', async (req, res) => {
     const tokenUser = getUserFromToken(req)
     if (!tokenUser) return res.status(401).json({ message: 'Неовластен пристап' })
@@ -90,7 +87,6 @@ app.get('/api/auth/profile', async (req, res) => {
     }
 })
 
-// PUT /api/auth/profile
 app.put('/api/auth/profile', async (req, res) => {
     const tokenUser = getUserFromToken(req)
     if (!tokenUser) return res.status(401).json({ message: 'Неовластен пристап' })
@@ -106,7 +102,6 @@ app.put('/api/auth/profile', async (req, res) => {
     }
 })
 
-// ─── BOOKS ────────────────────────────────────────────────
 
 app.get('/api/books', async (req, res) => {
     try {
@@ -128,24 +123,25 @@ app.get('/api/books/:id', async (req, res) => {
 })
 
 app.post('/api/books', async (req, res) => {
-    const { title, author, year, description, available, cover_url } = req.body
+    const { title, author, year, description, available, cover_url, genre } = req.body
     try {
         const result = await pool.query(
-            'INSERT INTO books (title, author, year, description, available, cover_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-            [title, author, year, description, available ?? true, cover_url || null]
+            'INSERT INTO books (title, author, year, description, available, cover_url, genre) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+            [title, author, parseInt(year), description, available ?? true, cover_url || null, genre || null]
         )
         res.status(201).json(result.rows[0])
     } catch (err) {
+        console.error("ГРЕШКА ПРИ ДОДАВАЊЕ КНИГА:", err.message);
         res.status(500).json({ error: err.message })
     }
 })
 
 app.put('/api/books/:id', async (req, res) => {
-    const { title, author, year, description, available, cover_url } = req.body
+    const { title, author, year, description, available, cover_url ,genre} = req.body
     try {
         const result = await pool.query(
-            'UPDATE books SET title=$1, author=$2, year=$3, description=$4, available=$5, cover_url=$6 WHERE id=$7 RETURNING *',
-            [title, author, year, description, available, cover_url || null, req.params.id]
+            'UPDATE books SET title=$1, author=$2, year=$3, description=$4, available=$5, cover_url=$6, genre=$7 WHERE id=$8 RETURNING *',
+            [title, author, year, description, available, cover_url || null, genre || null, req.params.id]
         )
         if (result.rows.length === 0) return res.status(404).json({ error: 'Book not found' })
         res.json(result.rows[0])
@@ -164,9 +160,7 @@ app.delete('/api/books/:id', async (req, res) => {
     }
 })
 
-// ─── RESERVATIONS ─────────────────────────────────────────
 
-// GET — за обичен корисник само неговите, за admin сите
 app.get('/api/reservations', async (req, res) => {
     const tokenUser = getUserFromToken(req)
     try {
@@ -199,7 +193,6 @@ app.get('/api/reservations', async (req, res) => {
     }
 })
 
-// POST — зачувај со user_id
 app.post('/api/reservations', async (req, res) => {
     const tokenUser = getUserFromToken(req)
     if (!tokenUser) return res.status(401).json({ error: 'Неовластен пристап' })
@@ -216,7 +209,6 @@ app.post('/api/reservations', async (req, res) => {
     }
 })
 
-// PUT — ажурирај статус (само admin)
 app.put('/api/reservations/:id', async (req, res) => {
     const tokenUser = getUserFromToken(req)
     if (!tokenUser || tokenUser.role !== 'admin')
@@ -233,7 +225,6 @@ app.put('/api/reservations/:id', async (req, res) => {
     }
 })
 
-// DELETE — откажи резервација
 app.delete('/api/reservations/:id', async (req, res) => {
     try {
         const resRow = await pool.query('SELECT book_id FROM reservations WHERE id=$1', [req.params.id])

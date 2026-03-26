@@ -5,7 +5,6 @@
 
     <div class="profile-wrap">
 
-      <!-- ── Лични податоци ── -->
       <div class="profile-card">
         <div class="card-header">
           <div class="avatar">{{ user?.name?.charAt(0) }}</div>
@@ -271,7 +270,6 @@ export default {
   font-size: 0.88rem;
 }
 
-/* ── Reservations ── */
 .res-list { display: flex; flex-direction: column; gap: 0.8rem; }
 
 .res-item {
