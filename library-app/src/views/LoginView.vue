@@ -25,28 +25,24 @@
             <div class="b" style="--w:34px;--h:115px;--o:0.85;--d:0.1s;"></div>
           </div>
         </div>
-
       </div>
     </div>
 
     <div class="auth-form-panel">
       <div class="form-container">
 
-        <div class="tabs">
+        <!-- Tabs — само кога НЕ е во OTP чекор -->
+        <div v-if="!otpStep" class="tabs">
           <button class="tab" :class="{ active: mode === 'login' }" @click="switchMode('login')">Log in</button>
           <button class="tab" :class="{ active: mode === 'register' }" @click="switchMode('register')">Register</button>
           <div class="tab-indicator" :class="{ right: mode === 'register' }"></div>
         </div>
 
-        <div v-if="error" class="alert alert-error">
-          {{ error }}
-        </div>
+        <div v-if="error" class="alert alert-error">{{ error }}</div>
+        <div v-if="success" class="alert alert-success">{{ success }}</div>
 
-        <div v-if="success" class="alert alert-success">
-          {{ success }}
-        </div>
-
-        <form v-if="mode === 'login'" class="auth-form" @submit.prevent="handleLogin">
+        <!-- ── LOGIN FORM ── -->
+        <form v-if="mode === 'login' && !otpStep" class="auth-form" @submit.prevent="handleLogin">
           <div class="field">
             <label>E-mail</label>
             <input v-model="loginForm.email" type="email" placeholder="your@email.com" required :disabled="loading"/>
@@ -70,7 +66,40 @@
           </p>
         </form>
 
-        <form v-if="mode === 'register'" class="auth-form" @submit.prevent="handleRegister">
+        <!-- ── OTP FORM ── -->
+        <form v-if="otpStep" class="auth-form" @submit.prevent="handleVerifyOTP">
+          <div class="otp-info">
+            <div class="otp-icon">✉️</div>
+            <p>Верификациски код е испратен на:</p>
+            <strong>{{ loginForm.email }}</strong>
+          </div>
+          <div class="field">
+            <label>Верификациски код</label>
+            <input
+                v-model="otpCode"
+                type="text"
+                placeholder="______"
+                maxlength="6"
+                required
+                :disabled="loading"
+                class="otp-input"
+            />
+          </div>
+          <button type="submit" class="btn-primary" :disabled="loading">
+            <span v-if="loading" class="spinner"></span>
+            <span v-else>Потврди</span>
+          </button>
+          <p class="switch-hint">
+            Не го добивте кодот?
+            <a href="#" @click.prevent="resendOTP">Испрати повторно</a>
+          </p>
+          <p class="switch-hint">
+            <a href="#" @click.prevent="otpStep = false">← Назад</a>
+          </p>
+        </form>
+
+        <!-- ── REGISTER FORM ── -->
+        <form v-if="mode === 'register' && !otpStep" class="auth-form" @submit.prevent="handleRegister">
           <div class="field">
             <label>First and Last name</label>
             <input v-model="registerForm.name" type="text" placeholder="John Doe" required :disabled="loading"/>
@@ -116,6 +145,8 @@
 <script>
 import BookService from '../service/BookService'
 
+const API = 'http://localhost:3000/api'
+
 export default {
   name: 'LoginView',
 
@@ -127,6 +158,8 @@ export default {
       success: null,
       showPassword: false,
       showConfirm: false,
+      otpStep: false,
+      otpCode: '',
       loginForm: { email: '', password: '' },
       registerForm: { name: '', email: '', password: '', confirmPassword: '' }
     }
@@ -146,24 +179,63 @@ export default {
       this.success = null
       this.showPassword = false
       this.showConfirm = false
+      this.otpStep = false
+      this.otpCode = ''
     },
 
     async handleLogin() {
       this.loading = true
       this.error = null
       try {
-        const data = await BookService.login(this.loginForm.email, this.loginForm.password)
-        BookService.saveSession(data.token, data.user)
-        if (data.user?.role === 'admin') {
-          this.$router.push('/admin')
-        } else {
-          this.$router.push('/')
+        const res = await fetch(`${API}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: this.loginForm.email, password: this.loginForm.password })
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.message || 'Грешка при логирање')
+
+        if (data.requiresOTP) {
+          this.otpStep = true
+          this.success = 'Кодот е испратен на вашиот email!'
         }
       } catch (err) {
         this.error = err.message
       } finally {
         this.loading = false
       }
+    },
+
+    async handleVerifyOTP() {
+      this.loading = true
+      this.error = null
+      try {
+        const res = await fetch(`${API}/auth/verify-otp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: this.loginForm.email, code: this.otpCode })
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.message || 'Погрешен код')
+
+        BookService.saveSession(data.token, data.user)
+        if (data.user?.role === 'admin') {
+          window.location.href = '/admin'
+        } else {
+          window.location.href = '/'
+        }
+      } catch (err) {
+        this.error = err.message
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async resendOTP() {
+      this.otpCode = ''
+      this.error = null
+      this.success = null
+      await this.handleLogin()
     },
 
     async handleRegister() {
@@ -255,12 +327,7 @@ export default {
 }
 
 .shelf { display: flex; flex-direction: column; align-items: center; }
-
-.row {
-  display: flex;
-  align-items: flex-end;
-  gap: 6px;
-}
+.row { display: flex; align-items: flex-end; gap: 6px; }
 
 .b {
   width: var(--w);
@@ -400,6 +467,35 @@ export default {
 }
 
 .field-error { font-size: 0.82rem; color: #c0392b; margin-top: 0.2rem; }
+
+/* ── OTP ── */
+.otp-info {
+  text-align: center;
+  padding: 1.2rem;
+  background: rgba(201,168,76,0.08);
+  border-radius: 8px;
+  border: 1px solid rgba(201,168,76,0.2);
+}
+
+.otp-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+
+.otp-info p {
+  font-size: 0.9rem;
+  color: #6b5040;
+  margin-bottom: 0.3rem;
+}
+
+.otp-info strong {
+  font-size: 0.9rem;
+  color: #2c1a0e;
+}
+
+.otp-input {
+  text-align: center !important;
+  font-size: 1.8rem !important;
+  letter-spacing: 0.4em !important;
+  font-weight: 700 !important;
+}
 
 .btn-primary {
   margin-top: 0.4rem;

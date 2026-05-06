@@ -1,8 +1,10 @@
+require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const { Pool } = require('pg')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const nodemailer = require('nodemailer')
 
 const app = express()
 const PORT = 3000
@@ -15,10 +17,47 @@ const pool = new Pool({
     host: 'localhost',
     port: 5432,
     database: 'libraries_db',
-    user: 'postgres',
-    password: 'nova123'
+    user: 'saramihajlova',
+    password: ''
 })
 
+// ─── NODEMAILER ───────────────────────────────────────────
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
+    }
+})
+
+// Привремено складиште за OTP кодови { email: { code, expires } }
+const otpStore = {}
+
+function generateOTP() {
+    return Math.floor(100000 + Math.random() * 900000).toString()
+}
+
+async function sendOTPEmail(email, code) {
+    await transporter.sendMail({
+        from: `"The Library" <${process.env.MAIL_USER}>`,
+        to: email,
+        subject: 'Ваш верификациски код — The Library',
+        html: `
+            <div style="font-family: Georgia, serif; max-width: 500px; margin: 0 auto; padding: 2rem; background: #f7f4ef;">
+                <h2 style="color: #2c1a0e; text-align: center;">The Library</h2>
+                <div style="background: white; border-radius: 8px; padding: 2rem; text-align: center; border-top: 4px solid #c9a84c;">
+                    <p style="color: #6b5040; margin-bottom: 1.5rem;">Вашиот верификациски код е:</p>
+                    <div style="font-size: 2.5rem; font-weight: 700; letter-spacing: 0.3em; color: #2c1a0e; background: #f5f0e8; padding: 1rem 2rem; border-radius: 8px; display: inline-block;">
+                        ${code}
+                    </div>
+                    <p style="color: #8b6b4a; margin-top: 1.5rem; font-size: 0.9rem;">Кодот е валиден 5 минути.</p>
+                </div>
+            </div>
+        `
+    })
+}
+
+// ─── HELPER ───────────────────────────────────────────────
 function getUserFromToken(req) {
     const auth = req.headers.authorization
     if (!auth) return null
@@ -30,6 +69,7 @@ function getUserFromToken(req) {
     }
 }
 
+// ─── AUTH ─────────────────────────────────────────────────
 
 app.post('/api/auth/register', async (req, res) => {
     const { name, email, password } = req.body
@@ -53,6 +93,7 @@ app.post('/api/auth/register', async (req, res) => {
     }
 })
 
+// Чекор 1: Логин — провери credentials и испрати OTP
 app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body
     if (!email || !password)
@@ -65,12 +106,49 @@ app.post('/api/auth/login', async (req, res) => {
         const match = await bcrypt.compare(password, user.password)
         if (!match)
             return res.status(401).json({ message: 'Погрешен email или лозинка' })
-        const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' })
-        res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } })
+
+        // Генерирај и испрати OTP
+        const code = generateOTP()
+        otpStore[email] = {
+            code,
+            userId: user.id,
+            expires: Date.now() + 5 * 60 * 1000 // 5 минути
+        }
+
+        await sendOTPEmail(email, code)
+
+        res.json({ requiresOTP: true, message: 'Верификациски код испратен на вашиот email' })
     } catch (err) {
         console.error('LOGIN ERROR:', err.message)
         res.status(500).json({ message: 'Серверска грешка' })
     }
+})
+
+// Чекор 2: Верификација на OTP
+app.post('/api/auth/verify-otp', async (req, res) => {
+    const { email, code } = req.body
+    if (!email || !code)
+        return res.status(400).json({ message: 'Внесете email и код' })
+
+    const entry = otpStore[email]
+    if (!entry)
+        return res.status(401).json({ message: 'Нема активен код за овој email' })
+    if (Date.now() > entry.expires) {
+        delete otpStore[email]
+        return res.status(401).json({ message: 'Кодот е истечен, логирајте се повторно' })
+    }
+    if (entry.code !== code)
+        return res.status(401).json({ message: 'Погрешен код' })
+
+    // Код е точен — генерирај токен
+    delete otpStore[email]
+    const result = await pool.query(
+        'SELECT id, name, email, role FROM users WHERE id = $1',
+        [entry.userId]
+    )
+    const user = result.rows[0]
+    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' })
+    res.json({ token, user })
 })
 
 app.get('/api/auth/profile', async (req, res) => {
@@ -102,6 +180,7 @@ app.put('/api/auth/profile', async (req, res) => {
     }
 })
 
+// ─── BOOKS ────────────────────────────────────────────────
 
 app.get('/api/books', async (req, res) => {
     try {
@@ -131,13 +210,13 @@ app.post('/api/books', async (req, res) => {
         )
         res.status(201).json(result.rows[0])
     } catch (err) {
-        console.error("ГРЕШКА ПРИ ДОДАВАЊЕ КНИГА:", err.message);
+        console.error("ГРЕШКА ПРИ ДОДАВАЊЕ КНИГА:", err.message)
         res.status(500).json({ error: err.message })
     }
 })
 
 app.put('/api/books/:id', async (req, res) => {
-    const { title, author, year, description, available, cover_url ,genre} = req.body
+    const { title, author, year, description, available, cover_url, genre } = req.body
     try {
         const result = await pool.query(
             'UPDATE books SET title=$1, author=$2, year=$3, description=$4, available=$5, cover_url=$6, genre=$7 WHERE id=$8 RETURNING *',
@@ -160,6 +239,7 @@ app.delete('/api/books/:id', async (req, res) => {
     }
 })
 
+// ─── RESERVATIONS ─────────────────────────────────────────
 
 app.get('/api/reservations', async (req, res) => {
     const tokenUser = getUserFromToken(req)
