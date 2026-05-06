@@ -17,8 +17,8 @@ const pool = new Pool({
     host: 'localhost',
     port: 5432,
     database: 'libraries_db',
-    user: 'saramihajlova',
-    password: ''
+    user: 'postgres',
+    password: 'nova123'
 })
 
 // ─── NODEMAILER ───────────────────────────────────────────

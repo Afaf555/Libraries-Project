@@ -1,40 +1,37 @@
 <template>
   <div class="app-wrapper">
 
+    <!-- Minimal Top Bar -->
+    <div class="top-bar">
+      <div class="social-links">
+        <a href="#" title="Instagram">📷</a>
+        <a href="#" title="Pinterest">📌</a>
+        <a href="#" title="Email">✉️</a>
+      </div>
+      <div class="top-info">
+        <span>Account & Profile →</span>
+      </div>
+    </div>
+
+    <!-- Main Navbar -->
     <nav class="navbar">
-      <router-link to="/" class="nav-logo">
-        <svg width="32" height="26" viewBox="0 0 32 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M16 5 C16 5 10 3 2 4 L2 22 C10 21 16 23 16 23" stroke="#c9a84c" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-          <path d="M16 5 C16 5 22 3 30 4 L30 22 C22 21 16 23 16 23" stroke="#c9a84c" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-          <line x1="16" y1="5" x2="16" y2="23" stroke="#c9a84c" stroke-width="1.2" stroke-dasharray="2 2"/>
-        </svg>
-        <div class="nav-logo-text">
-          <span class="nav-logo-name">The Library</span>
-          <span class="nav-logo-sub">Est. 2024</span>
-        </div>
-      </router-link>
+      <router-link to="/" class="nav-logo">The Library</router-link>
 
       <div class="nav-links">
         <router-link to="/" class="nav-link">Home</router-link>
-        <span class="nav-sep"></span>
         <router-link to="/books" class="nav-link">Books</router-link>
         <template v-if="!isAdmin">
-          <span class="nav-sep"></span>
-          <router-link to="/reservations" class="nav-link">My Reservations</router-link>
+          <router-link to="/reservations" class="nav-link">Reservations</router-link>
         </template>
-
         <template v-if="isAdmin">
-          <span class="nav-sep"></span>
-          <router-link to="/admin" class="nav-link">Admin Panel</router-link>
+          <router-link to="/admin" class="nav-link">Admin</router-link>
         </template>
-
-        <span class="nav-sep"></span>
-
-        <div v-if="user" class="nav-user">
+        <span class="nav-sep">|</span>
+        <template v-if="user">
           <router-link v-if="!isAdmin" to="/profile" class="nav-link">{{ user.name }}</router-link>
-          <button class="nav-logout" @click="logout">Log out</button>
-        </div>
-        <router-link v-else to="/login" class="nav-link nav-login">Log in</router-link>
+          <button class="nav-logout" @click="logout">Logout</button>
+        </template>
+        <router-link v-else to="/login" class="nav-link">Login</router-link>
       </div>
     </nav>
 
@@ -42,41 +39,43 @@
       <router-view/>
     </main>
 
+    <!-- Footer -->
     <footer class="footer">
-      <div class="footer-inner">
+      <div class="footer-content">
 
         <div class="footer-brand">
-          <div class="footer-logo">
-            <svg width="28" height="22" viewBox="0 0 32 26" fill="none">
-              <path d="M16 5 C16 5 10 3 2 4 L2 22 C10 21 16 23 16 23" stroke="#c9a84c" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-              <path d="M16 5 C16 5 22 3 30 4 L30 22 C22 21 16 23 16 23" stroke="#c9a84c" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-              <line x1="16" y1="5" x2="16" y2="23" stroke="#c9a84c" stroke-width="1.2" stroke-dasharray="2 2"/>
-            </svg>
-            <span class="footer-logo-name">The Library</span>
-          </div>
-          <p class="footer-tagline">Вашата дигитална библиотека.<br/>Читајте повеќе, знаете повеќе.</p>
+          <div class="footer-logo">The Library</div>
+          <p class="footer-tagline">Your digital sanctuary for books and knowledge</p>
         </div>
 
         <div class="footer-col">
-          <h4 class="footer-heading">Навигација</h4>
+          <h4 class="footer-heading">Navigation</h4>
           <router-link to="/" class="footer-link">Home</router-link>
-          <span class="nav-sep"></span>
-          <router-link to="/books" class="nav-link">Книги</router-link>
-          <router-link v-if="!isAdmin" to="/reservations" class="footer-link">My Reservations</router-link>
-          <router-link v-if="isAdmin" to="/admin" class="footer-link">Admin Panel</router-link>
+          <router-link to="/books" class="footer-link">Books</router-link>
+          <router-link v-if="!isAdmin" to="/reservations" class="footer-link">Reservations</router-link>
+          <router-link v-if="isAdmin" to="/admin" class="footer-link">Admin</router-link>
         </div>
 
         <div class="footer-col">
-          <h4 class="footer-heading">Информации</h4>
-          <span class="footer-text">Работно време: 08:00 – 20:00</span>
-          <span class="footer-text">Понеделник – Сабота</span>
+          <h4 class="footer-heading">Contact</h4>
+          <span class="footer-text">Mon - Sat</span>
+          <span class="footer-text">08:00 - 20:00</span>
           <span class="footer-text">contact@thelibrary.mk</span>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-heading">Follow</h4>
+          <div class="footer-social">
+            <a href="#">Instagram</a>
+            <a href="#">Pinterest</a>
+            <a href="#">Email</a>
+          </div>
         </div>
 
       </div>
 
       <div class="footer-bottom">
-        <span>© {{ new Date().getFullYear() }} The Library. Сите права задржани.</span>
+        <span>© {{ new Date().getFullYear() }} The Library</span>
       </div>
     </footer>
 
@@ -123,6 +122,8 @@ export default {
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
+
 * {
   margin: 0;
   padding: 0;
@@ -137,208 +138,286 @@ export default {
   min-height: 100vh;
 }
 
-.app-main { flex: 1; }
+.app-main {
+  flex: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOP BAR - Teresa Style
+   ═══════════════════════════════════════════════════════════ */
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 60px;
+  background: #ede8e0;
+  border-bottom: 1px solid rgba(227, 220, 209, 0.5);
+  font-size: 11px;
+}
+
+.social-links {
+  display: flex;
+  gap: 16px;
+}
+
+.social-links a {
+  font-size: 14px;
+  text-decoration: none;
+  opacity: 0.6;
+  transition: opacity 400ms;
+}
+
+.social-links a:hover {
+  opacity: 1;
+}
+
+.top-info {
+  font-size: 10px;
+  font-weight: 500;
+  color: #7d6f5f;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.top-info span {
+  cursor: pointer;
+  transition: color 400ms;
+}
+
+.top-info span:hover {
+  color: #5a4d3e;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NAVBAR - Minimal & Clean
+   ═══════════════════════════════════════════════════════════ */
 
 .navbar {
+  position: sticky;
+  top: 0;
+  background: rgba(253, 251, 247, 0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(227, 220, 209, 0.3);
+  padding: 20px 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2.5rem;
-  height: 68px;
-  background: #2c1a0e;
-  border-bottom: 1px solid rgba(201, 168, 76, 0.2);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  z-index: 1000;
 }
 
 .nav-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  font-family: 'Cormorant', serif;
+  font-size: 28px;
+  font-weight: 300;
+  font-style: italic;
+  color: #5a4d3e;
   text-decoration: none;
+  letter-spacing: 1px;
+  transition: opacity 400ms;
 }
 
-.nav-logo-text { display: flex; flex-direction: column; gap: 1px; }
-
-.nav-logo-name {
-  font-family: 'Georgia', serif;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #f0ead6;
-  line-height: 1;
-  letter-spacing: 0.02em;
-}
-
-.nav-logo-sub {
-  font-size: 9px;
-  color: #c9a84c;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+.nav-logo:hover {
+  opacity: 0.6;
 }
 
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 24px;
 }
 
 .nav-link {
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #c4a882;
+  font-size: 11px;
+  font-weight: 500;
+  color: #7d6f5f;
   text-decoration: none;
-  padding: 0.4rem 0.75rem;
-  transition: color 0.2s;
-  position: relative;
+  transition: color 400ms;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
 }
 
-.nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0.75rem;
-  right: 0.75rem;
-  height: 2px;
-  background: #c9a84c;
-  border-radius: 2px;
-  transform: scaleX(0);
-  transition: transform 0.2s ease;
+.nav-link:hover,
+.nav-link.router-link-active {
+  color: #3d3430;
 }
-
-.nav-link:hover { color: #f0ead6; }
-.nav-link:hover::after,
-.nav-link.router-link-active::after { transform: scaleX(1); }
-.nav-link.router-link-active { color: #f0ead6; }
-
-.nav-login {
-  border: 1px solid rgba(201, 168, 76, 0.4);
-  border-radius: 4px;
-  padding: 0.35rem 0.9rem;
-  color: #c9a84c;
-}
-
-.nav-login:hover { background: rgba(201, 168, 76, 0.1); color: #c9a84c; }
-.nav-login::after { display: none; }
 
 .nav-sep {
-  width: 1px;
-  height: 16px;
-  background: rgba(201, 168, 76, 0.2);
-}
-
-.nav-user {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.nav-username {
-  font-size: 0.82rem;
-  color: #f0ead6;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  color: #e3dcd1;
+  font-weight: 300;
 }
 
 .nav-logout {
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #8a6a4a;
+  font-size: 11px;
+  font-weight: 500;
+  color: #9d9084;
   background: transparent;
-  border: 1px solid rgba(201, 168, 76, 0.2);
+  border: 1px solid #e3dcd1;
   border-radius: 4px;
-  padding: 0.3rem 0.8rem;
+  padding: 6px 14px;
   cursor: pointer;
-  transition: color 0.2s, border-color 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  transition: all 400ms;
 }
 
 .nav-logout:hover {
-  color: #f0ead6;
-  border-color: rgba(201, 168, 76, 0.5);
+  color: #5a4d3e;
+  border-color: #c9bfb3;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   FOOTER - Soft & Detailed
+   ═══════════════════════════════════════════════════════════ */
 
 .footer {
-  background: #2c1a0e;
-  border-top: 1px solid rgba(201, 168, 76, 0.2);
-  padding-top: 3rem;
+  background: #f3efe9;
+  border-top: 1px solid rgba(227, 220, 209, 0.5);
+  padding-top: 60px;
+  margin-top: 100px;
 }
 
-.footer-inner {
-  display: flex;
-  gap: 4rem;
-  justify-content: space-between;
-  padding: 0 3rem 2.5rem;
-  flex-wrap: wrap;
+.footer-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px;
+  padding: 0 60px 48px;
 }
 
-.footer-brand { max-width: 220px; }
+.footer-brand {
+  max-width: 320px;
+}
 
 .footer-logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 1rem;
-}
-
-.footer-logo-name {
-  font-family: 'Georgia', serif;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #f0ead6;
-  letter-spacing: 0.02em;
+  font-family: 'Cormorant', serif;
+  font-size: 32px;
+  font-weight: 300;
+  font-style: italic;
+  color: #5a4d3e;
+  margin-bottom: 16px;
+  letter-spacing: 1px;
 }
 
 .footer-tagline {
-  font-size: 0.85rem;
-  color: #7a6555;
-  line-height: 1.7;
-  font-style: italic;
-  font-family: 'Georgia', serif;
+  font-size: 13px;
+  color: #9d9084;
+  line-height: 1.8;
+  font-weight: 300;
 }
 
-.footer-col { display: flex; flex-direction: column; gap: 0.6rem; }
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
 .footer-heading {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
-  color: #c9a84c;
-  margin-bottom: 0.4rem;
-  font-family: 'Georgia', serif;
+  color: #7d6f5f;
+  margin-bottom: 4px;
 }
 
 .footer-link {
-  font-size: 0.88rem;
-  color: #a08060;
+  font-size: 13px;
+  color: #9d9084;
   text-decoration: none;
-  transition: color 0.2s;
-  letter-spacing: 0.03em;
+  transition: color 400ms;
+  font-weight: 300;
 }
 
-.footer-link:hover { color: #f0ead6; }
+.footer-link:hover {
+  color: #5a4d3e;
+}
 
 .footer-text {
-  font-size: 0.88rem;
-  color: #7a6555;
-  letter-spacing: 0.03em;
+  font-size: 13px;
+  color: #aea396;
+  font-weight: 300;
+}
+
+.footer-social {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-social a {
+  font-size: 13px;
+  color: #9d9084;
+  text-decoration: none;
+  transition: color 400ms;
+  font-weight: 300;
+}
+
+.footer-social a:hover {
+  color: #5a4d3e;
 }
 
 .footer-bottom {
-  border-top: 1px solid rgba(201, 168, 76, 0.1);
-  padding: 1rem 3rem;
-  font-size: 0.78rem;
-  color: #5a4535;
-  letter-spacing: 0.04em;
+  border-top: 1px solid rgba(227, 220, 209, 0.3);
+  padding: 20px 60px;
+  text-align: center;
+  font-size: 11px;
+  color: #bfb5a9;
+  letter-spacing: 1px;
 }
 
-@media (max-width: 700px) {
-  .footer-inner { flex-direction: column; gap: 2rem; padding: 0 1.5rem 2rem; }
-  .footer-bottom { padding: 1rem 1.5rem; }
-  .navbar { padding: 0 1.2rem; }
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════ */
+
+@media (max-width: 900px) {
+  .top-bar {
+    padding: 10px 32px;
+    font-size: 10px;
+  }
+
+  .navbar {
+    padding: 16px 32px;
+  }
+
+  .nav-links {
+    gap: 16px;
+  }
+
+  .nav-logo {
+    font-size: 24px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    padding: 0 32px 40px;
+    gap: 32px;
+  }
+
+  .footer-bottom {
+    padding: 16px 32px;
+  }
+}
+
+@media (max-width: 600px) {
+  .top-bar {
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 20px;
+  }
+
+  .navbar {
+    padding: 16px 20px;
+  }
+
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .nav-sep {
+    display: none;
+  }
 }
 </style>
