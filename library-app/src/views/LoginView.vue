@@ -237,20 +237,28 @@ export default {
       this.success = null
       await this.handleLogin()
     },
-
     async handleRegister() {
       if (this.passwordMismatch) return
       this.loading = true
       this.error = null
       try {
-        const data = await BookService.register(
-            this.registerForm.name,
-            this.registerForm.email,
-            this.registerForm.password
-        )
-        BookService.saveSession(data.token, data.user)
-        this.success = 'Успешна регистрација! Пренасочување...'
-        setTimeout(() => this.$router.push('/'), 1200)
+        const res = await fetch('http://localhost:3000/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: this.registerForm.name,
+            email: this.registerForm.email,
+            password: this.registerForm.password
+          })
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.message || 'Грешка при регистрација')
+
+        if (data.requiresOTP) {
+          this.loginForm.email = this.registerForm.email
+          this.otpStep = true
+          this.success = 'Кодот е испратен на вашиот email!'
+        }
       } catch (err) {
         this.error = err.message
       } finally {

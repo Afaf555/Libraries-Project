@@ -85,8 +85,17 @@ app.post('/api/auth/register', async (req, res) => {
             [name, email, hashed, 'user']
         )
         const user = result.rows[0]
-        const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' })
-        res.status(201).json({ token, user })
+
+        // Испрати OTP за верификација
+        const code = generateOTP()
+        otpStore[email] = {
+            code,
+            userId: user.id,
+            expires: Date.now() + 5 * 60 * 1000
+        }
+        await sendOTPEmail(email, code)
+
+        res.status(201).json({ requiresOTP: true, message: 'Верификациски код испратен на вашиот email' })
     } catch (err) {
         console.error('REGISTER ERROR:', err.message)
         res.status(500).json({ message: 'Серверска грешка' })
