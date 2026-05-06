@@ -2,16 +2,16 @@
   <div class="app-wrapper">
 
     <!-- Minimal Top Bar -->
-    <div class="top-bar">
-      <div class="social-links">
-        <a href="#" title="Instagram">📷</a>
-        <a href="#" title="Pinterest">📌</a>
-        <a href="#" title="Email">✉️</a>
-      </div>
-      <div class="top-info">
-        <span>Account & Profile →</span>
-      </div>
-    </div>
+<!--    <div class="top-bar">-->
+<!--      <div class="social-links">-->
+<!--        <a href="#" title="Instagram">📷</a>-->
+<!--        <a href="#" title="Pinterest">📌</a>-->
+<!--        <a href="#" title="Email">✉️</a>-->
+<!--      </div>-->
+<!--      <div class="top-info">-->
+<!--        <span>Account & Profile →</span>-->
+<!--      </div>-->
+<!--    </div>-->
 
     <!-- Main Navbar -->
     <nav class="navbar">
