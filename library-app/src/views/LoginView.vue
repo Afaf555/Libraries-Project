@@ -247,7 +247,7 @@ export default {
       this.loading = true
       this.error = null
       try {
-        const endpoint = this.isRegisterOTP ? 'verify-register-otp' : 'verify-otp'
+        const endpoint =  'verify-otp'
         const email = this.isRegisterOTP ? this.registerForm.email : this.loginForm.email
 
         const res = await fetch(`${API}/auth/${endpoint}`, {
