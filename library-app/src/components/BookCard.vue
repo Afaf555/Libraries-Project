@@ -7,12 +7,12 @@
           <span class="placeholder-letter">{{ book.title.charAt(0) }}</span>
         </div>
         <div class="cover-overlay">
-          <div class="overlay-content">
-            <span class="quick-view">View Details</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </div>
+<!--          <div class="overlay-content">-->
+<!--            <span class="quick-view">View Details</span>-->
+<!--            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">-->
+<!--              <path d="M5 12h14M12 5l7 7-7 7"/>-->
+<!--            </svg>-->
+<!--          </div>-->
         </div>
       </div>
       <span class="status-badge" :class="book.available ? 'available' : 'unavailable'">
