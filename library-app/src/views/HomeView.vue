@@ -31,9 +31,9 @@
       </div>
 
       <div class="hero-visual">
-        <div class="book-spine"></div>
-        <div class="book-spine"></div>
-        <div class="book-spine"></div>
+        <img class="hero-book" src="https://i.pinimg.com/736x/54/52/5f/54525f21d25093809ef140100c7aebc4.jpg" alt="book"/>
+        <img class="hero-book hero-book--tall" src="https://i.pinimg.com/736x/51/72/ac/5172accf11e6517d7e8d3f107f15f5a9.jpg" alt="book"/>
+        <img class="hero-book" src="https://i.pinimg.com/736x/61/7b/35/617b35ba2abf59cd901786c9b64ddb78.jpg" alt="book"/>
       </div>
     </section>
 
@@ -74,18 +74,22 @@
         <a href="/books" class="link-view-all">View all →</a>
       </div>
 
-      <div class="book-carousel">
-        <div v-for="(book, i) in featuredBooks" :key="i" class="book-item">
-          <div class="book-cover">
-            <img v-if="book.cover_url" :src="book.cover_url" :alt="book.title" style="width:100%;height:100%;object-fit:cover;border-radius:4px;"/>
-            <div v-else class="book-initial">{{ book.initial }}</div>
+      <!-- Carousel with arrows -->
+      <div class="carousel-wrap">
+        <button class="carousel-btn" @click="scrollLeft">&#8592;</button>
+        <div class="book-carousel" ref="carousel">
+          <div v-for="(book, i) in featuredBooks" :key="i" class="book-item">
+            <div class="book-cover">
+              <img v-if="book.cover_url" :src="book.cover_url" :alt="book.title" style="width:100%;height:100%;object-fit:cover;border-radius:4px;"/>
+              <div v-else class="book-initial">{{ book.initial }}</div>
+            </div>
+            <h3 class="book-title">{{ book.title }}</h3>
+            <p class="book-author">{{ book.author }}</p>
+            <span class="book-status" :class="book.statusClass">{{ book.status }}</span>
           </div>
-          <h3 class="book-title">{{ book.title }}</h3>
-          <p class="book-author">{{ book.author }}</p>
-          <span class="book-status" :class="book.statusClass">{{ book.status }}</span>
         </div>
+        <button class="carousel-btn" @click="scrollRight">&#8594;</button>
       </div>
-
 
       <!-- Quote Section -->
       <div class="quote-section">
@@ -128,7 +132,7 @@ export default {
 
   async mounted() {
     const all = await BookService.getBooks()
-    this.featuredBooks = all.slice(0, 6).map(b => ({
+    this.featuredBooks = all.map(b => ({
       id: b.id,
       initial: b.title.charAt(0),
       title: b.title,
@@ -145,6 +149,12 @@ export default {
         alert('Subscribed: ' + this.email)
         this.email = ''
       }
+    },
+    scrollLeft() {
+      this.$refs.carousel.scrollLeft -= 440
+    },
+    scrollRight() {
+      this.$refs.carousel.scrollLeft += 440
     }
   }
 }
@@ -157,10 +167,10 @@ export default {
 .hero {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  min-height: 420px;
+  min-height: 560px;
   background: #fdfbf7;
-  padding: 60px 120px 50px;
-  gap: 60px;
+  padding: 80px 120px 70px;
+  gap: 80px;
   align-items: center;
 }
 
@@ -242,6 +252,7 @@ export default {
   text-transform: uppercase;
   letter-spacing: 1.5px;
 }
+
 .hero-visual {
   display: flex;
   align-items: flex-end;
@@ -250,17 +261,18 @@ export default {
   padding-bottom: 0;
 }
 
-.book-spine {
-  width: 50px;
-  background: #ede8e0;
-  border-radius: 4px;
+.hero-book {
+  width: 180px;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 6px 12px 32px rgba(61,52,48,0.15);
   transition: transform 400ms;
+  align-self: flex-end;
 }
 
-.book-spine:nth-child(1) { height: 220px; }
-.book-spine:nth-child(2) { height: 270px; }
-.book-spine:nth-child(3) { height: 300px; }
-.book-spine:hover { transform: translateY(-10px); }
+.hero-book--tall { height: 320px; }
+.hero-book:hover { transform: translateY(-10px); }
 
 /* ── About ── */
 .about-section {
@@ -270,6 +282,7 @@ export default {
   padding: 50px 60px;
   background: #f8f5f1;
 }
+
 .about-image {
   border-radius: 4px;
   overflow: hidden;
@@ -367,20 +380,51 @@ export default {
 
 .link-view-all:hover { color: #5a4d3e; }
 
+/* ── Carousel ── */
+.carousel-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 50px;
+}
+
 .book-carousel {
+  flex: 1;
   display: flex;
   gap: 20px;
   overflow-x: auto;
   padding-bottom: 16px;
-  margin-bottom: 50px;
   scrollbar-width: none;
+  scroll-behavior: smooth;
 }
 
 .book-carousel::-webkit-scrollbar { display: none; }
 
+.carousel-btn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #e3dcd1;
+  background: #fdfbf7;
+  color: #5a4d3e;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 400ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-btn:hover {
+  background: #3d3430;
+  color: #fdfbf7;
+  border-color: #3d3430;
+}
+
 .book-item {
   flex-shrink: 0;
-  width: 200px;
+  width: 230px;
 }
 
 .book-cover {
@@ -433,40 +477,10 @@ export default {
 .book-status.available { background: rgba(159,174,143,0.15); color: #7a8c67; }
 .book-status.reserved { background: rgba(212,185,150,0.15); color: #c9a88f; }
 
-/* ── Features ── */
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 36px;
-  margin-bottom: 50px;
-}
-
-.feature { text-align: center; }
-
-.feature-icon {
-  font-size: 36px;
-  margin-bottom: 12px;
-}
-
-.feature h3 {
-  font-family: 'Cormorant', serif;
-  font-size: 20px;
-  font-weight: 400;
-  color: #3d3430;
-  margin-bottom: 8px;
-}
-
-.feature p {
-  font-size: 13px;
-  color: #7d6f5f;
-  line-height: 1.7;
-  font-weight: 300;
-}
-
 /* ── Quote ── */
 .quote-section {
   background: #f3efe9;
-  padding: 40px 60px;
+  padding: 40px 120px;
   border-radius: 4px;
   text-align: center;
   margin-bottom: 50px;
@@ -573,6 +587,5 @@ export default {
   .hero-visual { display: none; }
   .about-section { grid-template-columns: 1fr; padding: 40px 24px; }
   .three-cards { grid-template-columns: 1fr; padding: 40px 24px; }
-  .features-grid { grid-template-columns: 1fr; }
 }
 </style>
