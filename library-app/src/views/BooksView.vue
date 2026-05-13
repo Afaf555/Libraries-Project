@@ -127,19 +127,18 @@ export default {
   right: 5px;
   top: 50%;
   transform: translateY(-50%);
-  background: #2c1a0e;
-  color: #e8c97a;
+  background: #3d3430;
+  color: #fdfbf7;
   border: none;
-  padding: 0.55rem 1.2rem;
-  border-radius: 3px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  padding: 10px 24px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 400ms;
 }
-.search-btn:hover { background: #6b3f1f; }
+.search-btn:hover { background: #5a4d3e; transform: translateY(-50%) translateY(-2px); }
 
 .genre-select {
   padding: 0.9rem 1.2rem;
