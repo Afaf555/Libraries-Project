@@ -68,7 +68,7 @@ export default {
         })
         if (!res.ok) {
             const err = await res.json()
-            throw new Error(err.message || 'Грешка при логирање')
+            throw new Error(err.message || 'Login error')
         }
         return res.json()
     },
@@ -81,7 +81,7 @@ export default {
         })
         if (!res.ok) {
             const err = await res.json()
-            throw new Error(err.message || 'Грешка при регистрација')
+            throw new Error(err.message || 'Registration error')
         }
         return res.json()
     },

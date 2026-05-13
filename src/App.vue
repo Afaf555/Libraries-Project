@@ -54,29 +54,29 @@
             </svg>
             <span class="footer-logo-name">The Library</span>
           </div>
-          <p class="footer-tagline">Вашата дигитална библиотека.<br/>Читајте повеќе, знаете повеќе.</p>
+          <p class="footer-tagline">Your digital library.<br/>Read more, know more.</p>
         </div>
 
         <div class="footer-col">
-          <h4 class="footer-heading">Навигација</h4>
+          <h4 class="footer-heading">Navigation</h4>
           <router-link to="/" class="footer-link">Home</router-link>
           <span class="nav-sep"></span>
-          <router-link to="/books" class="nav-link">Книги</router-link>
+          <router-link to="/books" class="nav-link">Books</router-link>
           <router-link v-if="!isAdmin" to="/reservations" class="footer-link">My Reservations</router-link>
           <router-link v-if="isAdmin" to="/admin" class="footer-link">Admin Panel</router-link>
         </div>
 
         <div class="footer-col">
-          <h4 class="footer-heading">Информации</h4>
-          <span class="footer-text">Работно време: 08:00 – 20:00</span>
-          <span class="footer-text">Понеделник – Сабота</span>
+          <h4 class="footer-heading">Information</h4>
+          <span class="footer-text">Opening Hours: 08:00 – 20:00</span>
+          <span class="footer-text">Monday – Saturday</span>
           <span class="footer-text">contact@thelibrary.mk</span>
         </div>
 
       </div>
 
       <div class="footer-bottom">
-        <span>© {{ new Date().getFullYear() }} The Library. Сите права задржани.</span>
+        <span>© {{ new Date().getFullYear() }} The Library. All rights reserved.</span>
       </div>
     </footer>
 

@@ -30,7 +30,7 @@ const transporter = nodemailer.createTransport({
     }
 })
 
-// Привремено складиште за OTP кодови { email: { code, expires } }
+// Temporary OTP storage { email: { code, expires } }
 const otpStore = {}
 
 function generateOTP() {
@@ -41,16 +41,16 @@ async function sendOTPEmail(email, code) {
     await transporter.sendMail({
         from: `"The Library" <${process.env.MAIL_USER}>`,
         to: email,
-        subject: 'Ваш верификациски код — The Library',
+        subject: 'Your verification code — The Library',
         html: `
             <div style="font-family: Georgia, serif; max-width: 500px; margin: 0 auto; padding: 2rem; background: #f7f4ef;">
                 <h2 style="color: #2c1a0e; text-align: center;">The Library</h2>
                 <div style="background: white; border-radius: 8px; padding: 2rem; text-align: center; border-top: 4px solid #c9a84c;">
-                    <p style="color: #6b5040; margin-bottom: 1.5rem;">Вашиот верификациски код е:</p>
+                    <p style="color: #6b5040; margin-bottom: 1.5rem;">Your verification code is:</p>
                     <div style="font-size: 2.5rem; font-weight: 700; letter-spacing: 0.3em; color: #2c1a0e; background: #f5f0e8; padding: 1rem 2rem; border-radius: 8px; display: inline-block;">
                         ${code}
                     </div>
-                    <p style="color: #8b6b4a; margin-top: 1.5rem; font-size: 0.9rem;">Кодот е валиден 5 минути.</p>
+                    <p style="color: #8b6b4a; margin-top: 1.5rem; font-size: 0.9rem;">The code is valid for 5 minutes.</p>
                 </div>
             </div>
         `
@@ -74,11 +74,11 @@ function getUserFromToken(req) {
 app.post('/api/auth/register', async (req, res) => {
     const { name, email, password } = req.body
     if (!name || !email || !password)
-        return res.status(400).json({ message: 'Сите полиња се задолжителни' })
+        return res.status(400).json({ message: 'All fields are required' })
     try {
         const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email])
         if (existing.rows.length > 0)
-            return res.status(409).json({ message: 'Корисник со тој email веќе постои' })
+            return res.status(409).json({ message: 'A user with this email already exists' })
         const hashed = await bcrypt.hash(password, 10)
         const result = await pool.query(
             'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, role',
@@ -86,7 +86,7 @@ app.post('/api/auth/register', async (req, res) => {
         )
         const user = result.rows[0]
 
-        // Испрати OTP за верификација
+        // Send OTP for verification
         const code = generateOTP()
         otpStore[email] = {
             code,
@@ -95,61 +95,60 @@ app.post('/api/auth/register', async (req, res) => {
         }
         await sendOTPEmail(email, code)
 
-        res.status(201).json({ requiresOTP: true, message: 'Верификациски код испратен на вашиот email' })
+        res.status(201).json({ requiresOTP: true, message: 'Verification code sent to your email' })
     } catch (err) {
         console.error('REGISTER ERROR:', err.message)
-        res.status(500).json({ message: 'Серверска грешка' })
+        res.status(500).json({ message: 'Server error' })
     }
 })
 
-// Чекор 1: Логин — провери credentials и испрати OTP
+// Step 1: Login — check credentials and send OTP
 app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body
     if (!email || !password)
-        return res.status(400).json({ message: 'Внесете email и лозинка' })
+        return res.status(400).json({ message: 'Please enter email and password' })
     try {
         const result = await pool.query('SELECT * FROM users WHERE email = $1', [email])
         if (result.rows.length === 0)
-            return res.status(401).json({ message: 'Погрешен email или лозинка' })
+            return res.status(401).json({ message: 'Invalid email or password' })
         const user = result.rows[0]
         const match = await bcrypt.compare(password, user.password)
         if (!match)
-            return res.status(401).json({ message: 'Погрешен email или лозинка' })
+            return res.status(401).json({ message: 'Invalid email or password' })
 
-        // Генерирај и испрати OTP
+        // Generate and send OTP
         const code = generateOTP()
         otpStore[email] = {
             code,
             userId: user.id,
-            expires: Date.now() + 5 * 60 * 1000 // 5 минути
+            expires: Date.now() + 5 * 60 * 1000 // 5 minutes
         }
 
         await sendOTPEmail(email, code)
 
-        res.json({ requiresOTP: true, message: 'Верификациски код испратен на вашиот email' })
+        res.json({ requiresOTP: true, message: 'Verification code sent to your email' })
     } catch (err) {
         console.error('LOGIN ERROR:', err.message)
-        res.status(500).json({ message: 'Серверска грешка' })
+        res.status(500).json({ message: 'Server error' })
     }
 })
 
-// Чекор 2: Верификација на OTP
+// Step 2: OTP Verification
 app.post('/api/auth/verify-otp', async (req, res) => {
     const { email, code } = req.body
     if (!email || !code)
-        return res.status(400).json({ message: 'Внесете email и код' })
+        return res.status(400).json({ message: 'Please enter email and code' })
 
     const entry = otpStore[email]
     if (!entry)
-        return res.status(401).json({ message: 'Нема активен код за овој email' })
+        return res.status(401).json({ message: 'No active code for this email' })
     if (Date.now() > entry.expires) {
         delete otpStore[email]
-        return res.status(401).json({ message: 'Кодот е истечен, логирајте се повторно' })
+        return res.status(401).json({ message: 'Code has expired, please log in again' })
     }
     if (entry.code !== code)
-        return res.status(401).json({ message: 'Погрешен код' })
+        return res.status(401).json({ message: 'Invalid code' })
 
-    // Код е точен — генерирај токен
     delete otpStore[email]
     const result = await pool.query(
         'SELECT id, name, email, role FROM users WHERE id = $1',
@@ -162,7 +161,7 @@ app.post('/api/auth/verify-otp', async (req, res) => {
 
 app.get('/api/auth/profile', async (req, res) => {
     const tokenUser = getUserFromToken(req)
-    if (!tokenUser) return res.status(401).json({ message: 'Неовластен пристап' })
+    if (!tokenUser) return res.status(401).json({ message: 'Unauthorized access' })
     try {
         const result = await pool.query(
             'SELECT id, name, email, role, street, street_number, city, country FROM users WHERE id = $1',
@@ -170,13 +169,13 @@ app.get('/api/auth/profile', async (req, res) => {
         )
         res.json(result.rows[0])
     } catch (err) {
-        res.status(500).json({ message: 'Серверска грешка' })
+        res.status(500).json({ message: 'Server error' })
     }
 })
 
 app.put('/api/auth/profile', async (req, res) => {
     const tokenUser = getUserFromToken(req)
-    if (!tokenUser) return res.status(401).json({ message: 'Неовластен пристап' })
+    if (!tokenUser) return res.status(401).json({ message: 'Unauthorized access' })
     const { name, street, street_number, city, country } = req.body
     try {
         const result = await pool.query(
@@ -185,11 +184,10 @@ app.put('/api/auth/profile', async (req, res) => {
         )
         res.json(result.rows[0])
     } catch (err) {
-        res.status(500).json({ message: 'Серверска грешка' })
+        res.status(500).json({ message: 'Server error' })
     }
 })
 
-// ─── BOOKS ────────────────────────────────────────────────
 
 app.get('/api/books', async (req, res) => {
     try {
@@ -219,7 +217,7 @@ app.post('/api/books', async (req, res) => {
         )
         res.status(201).json(result.rows[0])
     } catch (err) {
-        console.error("ГРЕШКА ПРИ ДОДАВАЊЕ КНИГА:", err.message)
+        console.error("ERROR ADDING BOOK:", err.message)
         res.status(500).json({ error: err.message })
     }
 })
@@ -248,7 +246,6 @@ app.delete('/api/books/:id', async (req, res) => {
     }
 })
 
-// ─── RESERVATIONS ─────────────────────────────────────────
 
 app.get('/api/reservations', async (req, res) => {
     const tokenUser = getUserFromToken(req)
@@ -274,7 +271,7 @@ app.get('/api/reservations', async (req, res) => {
                 ORDER BY r.created_at DESC
             `, [tokenUser.id])
         } else {
-            return res.status(401).json({ error: 'Неовластен пристап' })
+            return res.status(401).json({ error: 'Unauthorized access' })
         }
         res.json(result.rows)
     } catch (err) {
@@ -284,7 +281,7 @@ app.get('/api/reservations', async (req, res) => {
 
 app.post('/api/reservations', async (req, res) => {
     const tokenUser = getUserFromToken(req)
-    if (!tokenUser) return res.status(401).json({ error: 'Неовластен пристап' })
+    if (!tokenUser) return res.status(401).json({ error: 'Unauthorized access' })
     const { book_id, type } = req.body
     try {
         await pool.query('UPDATE books SET available=false WHERE id=$1', [book_id])
@@ -301,7 +298,7 @@ app.post('/api/reservations', async (req, res) => {
 app.put('/api/reservations/:id', async (req, res) => {
     const tokenUser = getUserFromToken(req)
     if (!tokenUser || tokenUser.role !== 'admin')
-        return res.status(403).json({ error: 'Само admin може да го менува статусот' })
+        return res.status(403).json({ error: 'Only admin can change the status' })
     const { status } = req.body
     try {
         const result = await pool.query(

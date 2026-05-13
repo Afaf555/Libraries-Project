@@ -120,13 +120,13 @@
             <div style="font-size:0.78rem;color:var(--text-light);">{{ r.user_email }}</div>
           </td>
           <td>{{ r.type === 'pickup' ? 'Pickup' : 'Delivery' }}</td>
-          <td>{{ new Date(r.created_at).toLocaleDateString('mk-MK') }}</td>
+          <td>{{ new Date(r.created_at).toLocaleDateString('en-US') }}</td>
           <td>
             <select class="status-select" :value="r.status" @change="updateStatus(r.id, $event.target.value)">
-              <option value="pending">Во чекање</option>
-              <option value="processing">Во обработка</option>
-              <option value="shipped">Испратено</option>
-              <option value="delivered">Доставено</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
             </select>
           </td>
         </tr>

@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>Сите книги</h2>
+    <h2>All Books</h2>
     <div class="divider"></div>
 
     <!-- SEARCH + FILTER -->
@@ -14,7 +14,7 @@
             class="search-input"
             type="text"
             v-model="query"
-            placeholder="Пребарај книга, автор..."
+            placeholder="Search by title, author..."
         />
         <button class="search-btn" @click="query = ''">
           {{ query ? '✕' : 'Search' }}
@@ -22,13 +22,13 @@
       </div>
 
       <select class="genre-select" v-model="selectedGenre">
-        <option value="">Сите жанрови</option>
+        <option value="">All Genres</option>
         <option v-for="g in genres" :key="g" :value="g">{{ g }}</option>
       </select>
     </div>
 
     <p v-if="query || selectedGenre" class="results-count">
-      {{ filteredBooks.length }} резултат{{ filteredBooks.length !== 1 ? 'и' : '' }}
+      {{ filteredBooks.length }} result{{ filteredBooks.length !== 1 ? 's' : '' }}
     </p>
 
     <div class="divider"></div>
@@ -40,7 +40,7 @@
 
     <div v-else class="empty-state">
       <div class="icon">📖</div>
-      <p>Нема книги за пребарувањето.</p>
+      <p>No books found for your search.</p>
     </div>
   </div>
 </template>

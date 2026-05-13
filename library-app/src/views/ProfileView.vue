@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>Мојот профил</h2>
+    <h2>My Profile</h2>
     <div class="divider"></div>
 
     <div class="profile-wrap">
@@ -16,33 +16,33 @@
 
         <div class="divider"></div>
 
-        <h4 class="section-title">Адреса за достава</h4>
+        <h4 class="section-title">Delivery Address</h4>
 
         <div class="form-grid">
           <div class="form-group full-width">
-            <label>Улица</label>
-            <input v-model="form.street" type="text" placeholder="Улица бр." :disabled="!editing"/>
+            <label>Street</label>
+            <input v-model="form.street" type="text" placeholder="Street name" :disabled="!editing"/>
           </div>
           <div class="form-group">
-            <label>Број</label>
-            <input v-model="form.street_number" type="text" placeholder="бб" :disabled="!editing"/>
+            <label>Number</label>
+            <input v-model="form.street_number" type="text" placeholder="No." :disabled="!editing"/>
           </div>
           <div class="form-group">
-            <label>Град</label>
-            <input v-model="form.city" type="text" placeholder="Скопје" :disabled="!editing"/>
+            <label>City</label>
+            <input v-model="form.city" type="text" placeholder="City" :disabled="!editing"/>
           </div>
           <div class="form-group full-width">
-            <label>Држава</label>
-            <input v-model="form.country" type="text" placeholder="Македонија" :disabled="!editing"/>
+            <label>Country</label>
+            <input v-model="form.country" type="text" placeholder="Country" :disabled="!editing"/>
           </div>
         </div>
 
         <div class="form-actions">
-          <button v-if="!editing" class="btn btn-primary" @click="editing = true">Измени адреса</button>
+          <button v-if="!editing" class="btn btn-primary" @click="editing = true">Edit Address</button>
           <button v-if="editing" class="btn btn-gold" @click="saveProfile" :disabled="saving">
-            {{ saving ? 'Зачувување...' : 'Зачувај' }}
+            {{ saving ? 'Saving...' : 'Save' }}
           </button>
-          <button v-if="editing" class="btn btn-outline" @click="cancelEdit">Откажи</button>
+          <button v-if="editing" class="btn btn-outline" @click="cancelEdit">Cancel</button>
         </div>
 
         <div v-if="successMsg" class="alert-success">{{ successMsg }}</div>
@@ -51,15 +51,15 @@
 
       <!-- ── Моите резервации ── -->
       <div class="reservations-card">
-        <h4 class="section-title">Моите резервации</h4>
+        <h4 class="section-title">My Reservations</h4>
 
         <div v-if="reservations.length" class="res-list">
           <div v-for="r in reservations" :key="r.id" class="res-item">
             <div class="res-info">
               <span class="res-title">{{ r.book }}</span>
               <span class="res-author">{{ r.author }}</span>
-              <span class="res-type">{{ r.type === 'pickup' ? 'Подигање' : 'Достава до дом' }}</span>
-              <span class="res-date">{{ new Date(r.created_at).toLocaleDateString('mk-MK') }}</span>
+              <span class="res-type">{{ r.type === 'pickup' ? 'Pickup' : 'Home Delivery' }}</span>
+              <span class="res-date">{{ new Date(r.created_at).toLocaleDateString('en-US') }}</span>
             </div>
             <div class="res-status" :class="r.status">
               {{ statusLabel(r.status) }}
@@ -68,8 +68,8 @@
         </div>
 
         <div v-else class="empty-state">
-          <p>Немате резервации.</p>
-          <router-link to="/" class="btn btn-primary">Прелистај книги</router-link>
+          <p>You have no reservations.</p>
+          <router-link to="/" class="btn btn-primary">Browse Books</router-link>
         </div>
       </div>
 
@@ -133,8 +133,8 @@ export default {
           },
           body: JSON.stringify({ name: this.user.name, ...this.form })
         })
-        if (!res.ok) throw new Error('Грешка при зачувување')
-        this.successMsg = 'Адресата е успешно зачувана!'
+        if (!res.ok) throw new Error('Error saving')
+        this.successMsg = 'Address saved successfully!'
         this.editing = false
       } catch (err) {
         this.errorMsg = err.message
@@ -150,10 +150,10 @@ export default {
 
     statusLabel(status) {
       const labels = {
-        pending:    'Во чекање',
-        processing: 'Во обработка',
-        shipped:    'Испратено',
-        delivered:  'Доставено'
+        pending:    'Pending',
+        processing: 'Processing',
+        shipped:    'Shipped',
+        delivered:  'Delivered'
       }
       return labels[status] || status
     }
